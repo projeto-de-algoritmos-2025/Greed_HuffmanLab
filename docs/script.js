@@ -90,7 +90,7 @@ const textToAsciiBinary = (text) => {
     for (let i = 0; i < text.length; i++) {
         const charCode = text.charCodeAt(i);
         const binaryChar = charCode.toString(2).padStart(8, '0');
-        binaryString += binaryChar + (i < text.length - 1 ? ' ' : '');
+        binaryString += binaryChar;
     }
     return { binaryString: binaryString, bitCount: text.length * 8 };
 }
