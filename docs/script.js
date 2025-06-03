@@ -11,6 +11,10 @@ const frequencyOutputElem = document.getElementById('frequencyOutput');
 const errorMessageElem = document.getElementById('errorMessage');
 
 const frequencySection = document.getElementById('frequencySection');
+const treeSection = document.getElementById('treeSection');
+const codesSection = document.getElementById('codesSection');
+const compressedSection = document.getElementById('compressedSection');
+const asciiSection = document.getElementById('asciiSection');   
 
 let nodeIdCounter = 0; 
 
@@ -21,7 +25,7 @@ generateButton.addEventListener('click', () => {
     errorMessageElem.textContent = '';
     errorMessageElem.classList.add('hidden'); 
 
-    [frequencySection, asciiSection, codesSection, compressedSection].forEach(s => s.classList.add('hidden'));
+    [frequencySection, asciiSection, codesSection, compressedSection, treeSection].forEach(s => s.classList.add('hidden'));
 
     if (!text) {
         errorMessageElem.textContent = 'Por favor, insira um texto para análise.';
@@ -53,6 +57,9 @@ generateButton.addEventListener('click', () => {
         const encodedText = encodeTextWithHuffman(text, huffmanCodes);
         displayCompressedText(encodedText, asciiInfo.bitCount, Object.keys(frequencies).length);
         compressedSection.classList.remove('hidden');
+
+        displayTreeWithVisJS(huffmanTree); 
+        treeSection.classList.remove('hidden');
 
     } catch (error) {
         console.error("Erro no processamento Huffman:", error);
@@ -202,5 +209,130 @@ const displayCompressedText = (encodedText, originalTotalBits, numUniqueChars) =
         }
     }
     compressionStatsElem.textContent = statsText;
+}
+
+let visNetworkInstance = null; 
+
+const displayTreeWithVisJS = (rootNode) => {
+    const nodes = [];
+    const edges = [];
+    const processedNodeIds = new Set(); 
+
+    function traverseTree(node, parentId = null, edgeLabel = '') {
+        if (!node || processedNodeIds.has(node.id)) return;
+        processedNodeIds.add(node.id);
+
+        let label, shape, colorObj, fontColor;
+
+        if (node.char !== null) { 
+            const displayChar = node.char === ' ' ? "'␣'" : (node.char === '\n' ? "'\\n'" : node.char);
+            label = `${displayChar}\n(${node.freq})`;
+            shape = 'box'; 
+            colorObj = { background: '#50fa7b', border: '#282a36', hover: { background: '#8be9fd', border: '#282a36'} }; 
+            fontColor = '#282a36'; 
+        } else { 
+            label = `(${node.freq})`;
+            shape = 'circle';
+            colorObj = { background: '#ffb86c', border: '#282a36', hover: { background: '#ff79c6', border: '#282a36'} }; 
+            fontColor = '#282a36'; 
+        }
+        nodes.push({ 
+            id: node.id, 
+            label: label, 
+            shape: shape, 
+            color: colorObj, 
+            font: {size: 13, color: fontColor, face: 'monospace' } 
+        });
+
+        if (parentId !== null && parentId !== node.id) { 
+            edges.push({ 
+                from: parentId, 
+                to: node.id, 
+                label: edgeLabel, 
+                arrows: {to: {enabled: true, scaleFactor: 0.7, type: 'arrow'}}, 
+                color: { color: '#bd93f9', hover: '#ff79c6', highlight: '#ff79c6' }, 
+                font: {align: 'middle', size: 11, color: '#f8f8f2', strokeWidth: 2, strokeColor: '#282a36', face: 'monospace'} 
+            });
+        }
+
+        if (node.left) traverseTree(node.left, node.id, '0');
+        if (node.right) traverseTree(node.right, node.id, '1');
+    }
+    
+    if (rootNode) {
+        if (rootNode.char === null && rootNode.left && rootNode.left.char !== null && !rootNode.right) {
+            const parentNode = rootNode;
+            const childNode = rootNode.left;
+            
+            if (!processedNodeIds.has(parentNode.id)) {
+                    nodes.push({ id: parentNode.id, label: `(${parentNode.freq})`, shape: 'circle', color: { background: '#ffb86c', border: '#282a36' }, font: {size: 13, color: '#282a36', face: 'monospace'}});
+                    processedNodeIds.add(parentNode.id);
+            }
+            if (!processedNodeIds.has(childNode.id)) {
+                const displayChar = childNode.char === ' ' ? "'␣'" : (childNode.char === '\n' ? "'\\n'" : childNode.char);
+                nodes.push({id: childNode.id, label: `${displayChar}\n(${childNode.freq})`, shape: 'box', color: { background: '#50fa7b', border: '#282a36' }, font: {size: 13, color: '#282a36', face: 'monospace'}});
+                processedNodeIds.add(childNode.id);
+            }
+            if (parentNode.id !== childNode.id) { 
+                    edges.push({from: parentNode.id, to: childNode.id, label: '0', arrows: {to: {enabled: true, scaleFactor: 0.7}}, color: { color: '#bd93f9' }, font: {align: 'middle', size:11, color: '#f8f8f2', strokeWidth: 2, strokeColor: '#282a36', face: 'monospace'}});
+            }
+        } else {
+            traverseTree(rootNode);
+        }
+    }
+
+    const container = document.getElementById('treeOutput');
+    const data = {
+        nodes: new vis.DataSet(nodes),
+        edges: new vis.DataSet(edges),
+    };
+    const options = {
+        layout: {
+            hierarchical: {
+                enabled: true,
+                levelSeparation: 100, 
+                nodeSpacing: 100,    
+                treeSpacing: 150,    
+                direction: 'UD',     
+                sortMethod: 'directed', 
+                shakeTowards: 'roots' 
+            },
+        },
+        physics: { enabled: false }, 
+        nodes: {
+            borderWidth: 2,
+            borderWidthSelected: 3,
+            shadow: { enabled: true, size: 3, x:2, y:2, color: 'rgba(0,0,0,0.3)'} 
+        },
+        edges: {
+            width: 1.5, 
+            smooth: { 
+                enabled: true,
+                type: "cubicBezier", 
+                forceDirection: "vertical", 
+                roundness: 0.4
+            },
+            hoverWidth: factor => factor * 1.5, 
+        },
+        interaction: {
+            dragNodes: true, 
+            zoomView: true,  
+            dragView: true,
+            hover: true, 
+            tooltipDelay: 200
+        }
+    };
+    
+    if (visNetworkInstance) {
+        visNetworkInstance.destroy();
+    }
+
+    if (nodes.length > 0) { 
+        visNetworkInstance = new vis.Network(container, data, options);
+    } else if (rootNode && inputTextElem.value.length > 0) { 
+            container.innerHTML = '<p class="text-sm text-center p-4 text-slate-400">O grafo para esta entrada é muito simples ou não pôde ser gerado (ex: um único caractere repetido muitas vezes, resultando em um grafo trivial).</p>';
+    } else { 
+        container.innerHTML = '<p class="text-sm text-center p-4 text-slate-400">Árvore não pôde ser gerada (ex: texto vazio).</p>';
+    }
 }
 
