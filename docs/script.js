@@ -1,3 +1,7 @@
+const asciiOutputElem = document.getElementById('asciiOutput');
+const asciiBitsCountElem = document.getElementById('asciiBitsCount');
+
+
 const inputTextElem = document.getElementById('inputText');
 const generateButton = document.getElementById('generateButton');
 const frequencyOutputElem = document.getElementById('frequencyOutput');
@@ -11,7 +15,7 @@ generateButton.addEventListener('click', () => {
     errorMessageElem.textContent = '';
     errorMessageElem.classList.add('hidden'); 
 
-    [frequencySection].forEach(s => s.classList.add('hidden'));
+    [frequencySection, asciiSection].forEach(s => s.classList.add('hidden'));
 
     if (!text) {
         errorMessageElem.textContent = 'Por favor, insira um texto para análise.';
@@ -28,6 +32,11 @@ generateButton.addEventListener('click', () => {
         }
         displayFrequencies(frequencies);
         frequencySection.classList.remove('hidden');
+
+        const asciiInfo = textToAsciiBinary(text);
+        displayAsciiSequence(asciiInfo.binaryString, asciiInfo.bitCount);
+        asciiSection.classList.remove('hidden');
+
     } catch (error) {
         console.error("Erro no processamento Huffman:", error);
         errorMessageElem.textContent = `Ocorreu um erro inesperado: ${error.message}. Tente novamente ou verifique o console.`;
@@ -50,5 +59,21 @@ const displayFrequencies = (frequencies) => {
         freqText += `${displayChar.padEnd(5)}: ${frequencies[char]}\n`;
     }
     frequencyOutputElem.textContent = freqText.trim();
+}
+
+const textToAsciiBinary = (text) => {
+    let binaryString = '';
+    for (let i = 0; i < text.length; i++) {
+        const charCode = text.charCodeAt(i);
+        const binaryChar = charCode.toString(2).padStart(8, '0');
+        binaryString += binaryChar + (i < text.length - 1 ? ' ' : '');
+    }
+    return { binaryString: binaryString, bitCount: text.length * 8 };
+}
+
+const displayAsciiSequence = (binaryString, bitCount) => {
+    asciiOutputElem.textContent = binaryString;
+    const charCount = bitCount > 0 ? bitCount / 8 : 0;
+    asciiBitsCountElem.textContent = `Total de Bits (ASCII Padrão): ${bitCount} bits (${charCount} caracteres).`;
 }
 

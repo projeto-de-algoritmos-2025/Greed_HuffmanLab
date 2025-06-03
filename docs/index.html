@@ -26,12 +26,22 @@
         <div id="errorMessage" class="mt-6 hidden"></div> 
         
         <div id="outputContainer" class="mt-6 space-y-8">
+           
             <div id="frequencySection" class="output-section-card hidden">
                 <h2 class="section-title text-2xl">Frequência dos Caracteres</h2>
                 <div class="output-content">
                     <pre id="frequencyOutput" class="code-output"></pre>
                 </div>
             </div>
+
+            <div id="asciiSection" class="output-section-card hidden">
+                <h2 class="section-title text-2xl">Sequência Original em ASCII (Binário)</h2>
+                <div class="output-content">
+                    <p id="asciiOutput" class="binary-output"></p>
+                    <p id="asciiBitsCount" class="mt-3 stats-text"></p>
+                </div>
+            </div>
+
         </div>
          <footer class="text-center mt-12 py-6 border-t border-slate-700"> <p class="text-sm text-slate-500">Um projeto de visualização de Algoritmo de Huffman.</p>
         </footer>
