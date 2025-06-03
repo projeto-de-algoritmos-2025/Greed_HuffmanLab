@@ -1,3 +1,5 @@
+const compressedOutputElem = document.getElementById('compressedOutput');
+const compressionStatsElem = document.getElementById('compressionStats');
 const asciiOutputElem = document.getElementById('asciiOutput');
 const asciiBitsCountElem = document.getElementById('asciiBitsCount');
 const codesOutputElem = document.getElementById('codesOutput');
@@ -19,7 +21,7 @@ generateButton.addEventListener('click', () => {
     errorMessageElem.textContent = '';
     errorMessageElem.classList.add('hidden'); 
 
-    [frequencySection, asciiSection, codesSection].forEach(s => s.classList.add('hidden'));
+    [frequencySection, asciiSection, codesSection, compressedSection].forEach(s => s.classList.add('hidden'));
 
     if (!text) {
         errorMessageElem.textContent = 'Por favor, insira um texto para análise.';
@@ -47,6 +49,10 @@ generateButton.addEventListener('click', () => {
         const huffmanCodes = generateHuffmanCodes(huffmanTree);
         displayCodes(huffmanCodes);
         codesSection.classList.remove('hidden');
+
+        const encodedText = encodeTextWithHuffman(text, huffmanCodes);
+        displayCompressedText(encodedText, asciiInfo.bitCount, Object.keys(frequencies).length);
+        compressedSection.classList.remove('hidden');
 
     } catch (error) {
         console.error("Erro no processamento Huffman:", error);
@@ -160,3 +166,41 @@ const displayCodes = (codes) => {
     }
     codesOutputElem.textContent = codesText.trim();
 }
+
+const encodeTextWithHuffman = (text, codes) => {
+    let encoded = '';
+    for (const char of text) {
+        if (codes[char] !== undefined) {
+            encoded += codes[char];
+        } else {
+            console.warn(`Caractere '${char}' não encontrado nos códigos de Huffman. Será ignorado na compressão.`);
+        }
+    }
+    return encoded;
+}
+
+const displayCompressedText = (encodedText, originalTotalBits, numUniqueChars) => {
+    const currentInputText = inputTextElem.value; 
+    compressedOutputElem.textContent = encodedText || "N/A"; 
+    const compressedBits = encodedText.length;
+    
+    let statsText = `Original (ASCII): ${originalTotalBits} bits.\n`;
+    statsText += `Comprimido (Huffman): ${compressedBits} bits.\n`;
+
+    if (originalTotalBits > 0) { 
+        if (compressedBits < originalTotalBits) {
+            const savedBits = originalTotalBits - compressedBits;
+            const compressionRatio = (compressedBits / originalTotalBits);
+            const percentageSaved = (1 - compressionRatio) * 100;
+            statsText += `Economia: ${savedBits} bits (${percentageSaved.toFixed(2)}% de redução).\n`;
+            statsText += `Taxa de Compressão: ${(compressionRatio*100).toFixed(2)}% do tamanho original.`;
+        } else if (compressedBits > originalTotalBits) {
+                const extraBits = compressedBits - originalTotalBits;
+                statsText += `Resultado: Aumento de ${extraBits} bits. Huffman não foi eficiente aqui.`;
+        } else { 
+            statsText += `Resultado: Sem alteração no tamanho.`;
+        }
+    }
+    compressionStatsElem.textContent = statsText;
+}
+
