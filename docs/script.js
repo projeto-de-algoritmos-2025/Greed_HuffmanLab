@@ -45,21 +45,21 @@ generateButton.addEventListener('click', () => {
         displayFrequencies(frequencies);
         frequencySection.classList.remove('hidden');
 
-        const asciiInfo = textToAsciiBinary(text);
-        displayAsciiSequence(asciiInfo.binaryString, asciiInfo.bitCount);
-        asciiSection.classList.remove('hidden');
-
         const huffmanTree = buildHuffmanTree(frequencies);
         const huffmanCodes = generateHuffmanCodes(huffmanTree);
         displayCodes(huffmanCodes);
         codesSection.classList.remove('hidden');
+        
+        displayTreeWithVisJS(huffmanTree); 
+        treeSection.classList.remove('hidden');
+        
+        const asciiInfo = textToAsciiBinary(text);
+        displayAsciiSequence(asciiInfo.binaryString, asciiInfo.bitCount);
+        asciiSection.classList.remove('hidden');
 
         const encodedText = encodeTextWithHuffman(text, huffmanCodes);
         displayCompressedText(encodedText, asciiInfo.bitCount, Object.keys(frequencies).length);
         compressedSection.classList.remove('hidden');
-
-        displayTreeWithVisJS(huffmanTree); 
-        treeSection.classList.remove('hidden');
 
     } catch (error) {
         console.error("Erro no processamento Huffman:", error);
