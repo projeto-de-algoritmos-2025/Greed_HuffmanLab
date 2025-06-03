@@ -1,12 +1,13 @@
 # Visualizador de Algoritmo de Huffman
 
-**Número da Lista**: 3
+**Número da Lista**: 3 <br>
 **Conteúdo da Disciplina**: Algoritmos Ambiciosos
 
 ## Aluno
 
-| **Matrícula** | **Nome** | 
-| 19/0048191    | Renan Rodrigues Lacerda   |
+| Matrícula   | Nome                          |
+|-------------|-------------------------------|
+| 19/0048191  |     Renan Rodrigues Lacerda   |
 
 ## Link vídeo: [Video]()
 
