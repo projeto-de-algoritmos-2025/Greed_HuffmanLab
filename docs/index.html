@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabalho PA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="p-4"> <div class="container">
+        <h1 class="text-4xl font-bold mb-8 text-center">HuffmanLab: Visualizador & Codificador</h1>
+
+        <div class="mb-8 p-6 bg-slate-800 rounded-md shadow-lg"> <label for="inputText" class="block text-xl font-semibold mb-3 text-cyan-400">Digite o texto para comprimir:</label>
+            <textarea id="inputText" rows="5" class="w-full p-3 text-base bg-slate-700 text-slate-200 border-slate-600 focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50 rounded-md"></textarea>
+        </div>
+
+        <div class="text-center mb-8">
+            <button id="generateButton" class="primary-button w-full sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-2 -mt-1" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+                Analisar e Comprimir Texto
+            </button>
+        </div>
+
+        <div id="errorMessage" class="mt-6 hidden"></div> 
+        
+        <div id="outputContainer" class="mt-6 space-y-8">
+            <div id="frequencySection" class="output-section-card hidden">
+                <h2 class="section-title text-2xl">Frequência dos Caracteres</h2>
+                <div class="output-content">
+                    <pre id="frequencyOutput" class="code-output"></pre>
+                </div>
+            </div>
+        </div>
+         <footer class="text-center mt-12 py-6 border-t border-slate-700"> <p class="text-sm text-slate-500">Um projeto de visualização de Algoritmo de Huffman.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
